@@ -9,7 +9,10 @@ public class Circle implements Shape{
 	private int x,y;
 	private int ray;
 	private Color color;
-	
+	public int a;
+	public String m;
+	public Integer mq;
+	protected String q;
 
 	public Circle(int x, int y, int ray) {
 		super();

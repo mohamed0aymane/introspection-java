@@ -14,19 +14,26 @@ public class ClassParser {
 	
 	public String parse() {
 		StringBuilder sb=new StringBuilder();
+		 int methodCount = 0; // Compteur pour les méthodes
+		 int fieldCount = 0;
 		try {
 			//charger la classe
 			Class<?> cls=Class.forName(className);
 			
 			//Modifiers
 			int modifiers=cls.getModifiers();
-			sb.append(Modifier.toString(modifiers)).append(" class ").append(cls.getSimpleName());
-			
+			sb.append(Modifier.toString(modifiers))
+			.append(" class ")
+			.append(cls.getSimpleName());
+		
 			//savoir si la classe est generique ou non
 			if(cls.getTypeParameters().length>0) {
 				sb.append("<");
+				
 				for(int i=0;i<cls.getTypeParameters().length;i++) {
+					
 					sb.append(cls.getTypeParameters()[i].getName());
+					
 					if(i<cls.getTypeParameters().length-1) {
 						sb.append(",");
 					}
@@ -48,8 +55,10 @@ public class ClassParser {
 			if (interfaces.length > 0) {
 			    sb.append(" implements ");
 			    for (int i = 0; i < interfaces.length; i++) {
-			        // Savoir si l'interface est un type generique ou nn
+			        
+			    	// Savoir si l'interface est un type generique ou nn
 			        sb.append(interfaces[i].getSimpleName());
+			        
 			        TypeVariable<?>[] typeParameters = interfaces[i].getTypeParameters();
 			        if (typeParameters.length > 0) {
 			            sb.append("<");
@@ -61,6 +70,7 @@ public class ClassParser {
 			            }
 			            sb.append(">");
 			        }
+			        
 			        if (i < interfaces.length - 1) {
 			            sb.append(", ");
 			        }
@@ -70,45 +80,25 @@ public class ClassParser {
 			//field
 			sb.append("\n\nFields :\n");
 			for (Field field : cls.getDeclaredFields()) {
-			    sb.append("  ")
-			      .append(Modifier.toString(field.getModifiers())).append(" "); 
 			    
-			    // Savoir si un type genirique ou non
-			    Type genericType = field.getGenericType();
+			    if(field.getModifiers()!=Modifier.PRIVATE) {
+			    	sb.append("  ")
+			      .append(Modifier.toString(field.getModifiers())).append(" ")
+			      .append(field.getGenericType().getTypeName()).append(" ")
+			      .append(field.getName())
+			      .append(";\n");
+			    	fieldCount ++;
 			    
-			    //Savoir s il appartient au ParameterizedType: pour des types generiques parametres comme List<T>
-			    if (genericType instanceof ParameterizedType) {
-			        // Si le type est générique
-			        ParameterizedType paramType = (ParameterizedType) genericType;
-			        sb.append(((Class<?>) paramType.getRawType()).getSimpleName()); // Nom de la classe principale
-			        sb.append("<");
-			        Type[] typeArguments = paramType.getActualTypeArguments();
-			        for (int i = 0; i < typeArguments.length; i++) {
-			        	sb.append(typeArguments[i].getTypeName()); // Nom des paramètres génériques
-			            if (i < typeArguments.length - 1) {
-			                sb.append(", ");
-			            }
-			        }
-			        sb.append(">");
-			        
-				    //Savoir s il appartient au TypeVariable: pour des types generiques non resolus comme T
-			    }else if (genericType instanceof TypeVariable) {
-			        
-			        sb.append(((TypeVariable<?>) genericType).getName());
-			        
-				    //Savoir s il appartient au Class: pour des types concrets comme String,Integer...
-			    } else if (genericType instanceof Class) {
-			        // Si le type est une classe concrète
-			        sb.append(((Class<?>) genericType).getSimpleName());
-			        
+			    	
 			    }
-			    sb.append(" ").append(";\n"); // Nom du champ
 			}
+			    
+	
 
 			
 			sb.append(" \n\nConstructeur : \n");
 			// Constructeurs
-			for (Constructor<?>constructeur : cls.getDeclaredConstructors()) {
+			for (Constructor<?> constructeur : cls.getDeclaredConstructors()) {
 			    sb.append("  ")
 			      .append(Modifier.toString(constructeur.getModifiers())).append(" ")
 			      .append(cls.getSimpleName()).append(" (")
@@ -152,46 +142,14 @@ public class ClassParser {
 			       
 			    }
 			    sb.append(" ;\n");
+			    methodCount++;
 			}
 			
-			//Classes Interne
-			sb.append(" \n\n Classe Interne : \n");
-			for(Class<?> interneClasses:cls.getDeclaredClasses()) {
-				sb.append("  ")
-				.append(Modifier.toString(interneClasses.getModifiers())).append(" class ")
-				.append(interneClasses.getSimpleName());
-				//interfaces interne
-				
-				// Récupérer les interfaces implémentées par la classe
-				Class<?>[] interfacesinterne = interneClasses.getInterfaces();
-				if (interfaces.length > 0) {
-				    sb.append(" implements ");
-				    for (int i = 0; i < interfacesinterne.length; i++) {
-				        // Vérifier si l'interface est générique
-				        sb.append(interfacesinterne[i].getSimpleName());
-				        TypeVariable<?>[] typeParameters = interfaces[i].getTypeParameters();
-				        if (typeParameters.length > 0) {
-				            sb.append("<");
-				            for (int j = 0; j < typeParameters.length; j++) {
-				                sb.append(typeParameters[j].getName());
-				                if (j < typeParameters.length - 1) {
-				                    sb.append(", ");
-				                }
-				            }
-				            sb.append(">");
-				        }
-
-				        // Ajouter une virgule si ce n'est pas la dernière interface
-				        if (i < interfacesinterne.length - 1) {
-				            sb.append(", ");
-				        }
-				    }
-				}
-
-				
-			}
+		
 			
-			
+	        sb.append("\n\n Compter les nombre des methodes et Fields:\n")
+	          .append("  Nombre de Field: ").append(fieldCount).append("\n")
+	          .append("  Nombre de methodes : ").append(methodCount).append("\n");
 			
 			
 			
@@ -204,10 +162,11 @@ public class ClassParser {
 		
 	}
 
+	//concernant constructeur et methode
 	
 	private String getParameterList(Parameter[] parameters) {
 		StringBuilder sb=new StringBuilder();
-		for(int i=0;i<parameters.length;i++) {
+		for(int i=0;i<parameters.length ;i++) {
 			Parameter prmt=parameters[i];
 			sb.append(prmt.getParameterizedType())//pour verifier si il'est generic ou non
 			.append(" ");

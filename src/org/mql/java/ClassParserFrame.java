@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 public class ClassParserFrame extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private String title;
+    
     
     private JTextField classNameField;
     private JTextArea textArea;
@@ -20,7 +20,7 @@ public class ClassParserFrame extends JPanel {
     private JPanel container;
 
     public ClassParserFrame(String title) {
-        this.title = title;
+       
 
         classNameField = new JTextField(20); 
         textArea = new JTextArea(5,10 ); 
@@ -68,7 +68,7 @@ public class ClassParserFrame extends JPanel {
 	}
   
     	
-		//avec l'introspection on peut tous recuperer
+		
 		private class Action implements ActionListener{
 			private Object obj; // Instance de la classe contenant la méthode
 			private Method method; // Méthode à invoquer

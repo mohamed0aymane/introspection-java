@@ -8,6 +8,7 @@ public class Examples extends JFrame  {
 
 
 	private static final long serialVersionUID = 1L;
+	
 	public Examples() {
 		exp02();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);

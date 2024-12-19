@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 
 public class LinkedList<T> implements List<T>,Iterable<T> {
-	private T value;//stocke la valeur actuel du type generique  T
-	private LinkedList<T> next;//next pour reference vers le noeud suivant  dans la liste chaine
+	public T value;//stocke la valeur actuel du type generique  T
+	public LinkedList<T> next;//next pour reference vers le noeud suivant  dans la liste chaine
 	
 	//un constructeur sans parametre
 	/*En définissant value et next à null, 
